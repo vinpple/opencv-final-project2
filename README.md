@@ -46,4 +46,4 @@ https://youtu.be/eZtCvv4RNvE?si=__MCgM1A17ZDdMrV
      -6, 9, 0 비교
 
 
-  5. 무게 중심을 기준으로 가로 세로 나누고 비교
+  5. 무게 중심을 기준으로 y축으로 나누고 비교
