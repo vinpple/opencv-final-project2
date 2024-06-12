@@ -1,4 +1,5 @@
 1. 외곽선 개수 구하기
+
 		int getCounting_contour(Mat img)
 		{
 			bin = morph(img);
