@@ -42,7 +42,24 @@ https://youtu.be/eZtCvv4RNvE?si=__MCgM1A17ZDdMrV
 			return Point(per_x, per_y);
 		}
 
-  3. 바운딩 박스의 중점과 무게 중심의 높이 차이를 비교
+ 3. 바운딩 박스 구하기
+Mat bounding_img(Mat img)
+		{
+			Mat labels, stats, centroids;
+		
+			int cnt = connectedComponentsWithStats(bin, labels, stats, centroids);
+			if (cnt < 2)
+			{
+				cerr << "Bounding box not found. too small." << endl;
+				return Mat();
+			}
+			int* p = stats.ptr<int>(1);
+			bin = bin(Rect(p[0], p[1], p[2], p[3]));
+		
+			return bin;
+		}
+    
+  4. 바운딩 박스의 중점과 무게 중심의 높이 차이를 비교
      -6, 9, 0 비교
 
 
