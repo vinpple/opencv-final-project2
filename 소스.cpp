@@ -228,7 +228,7 @@ Mat bounding_img(Mat img)
 
 
 Mat morph(Mat img) {	//모폴로지 연산
-	draw_img = img(Rect(0, 0, 500, 500));
+	draw_img = img(Rect(1, 1, 498, 498));
 	cvtColor(draw_img, gray, COLOR_BGR2GRAY);
 	threshold(gray, bin, 0, 255, THRESH_BINARY_INV | THRESH_OTSU);
 
