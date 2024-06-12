@@ -187,7 +187,7 @@ int getCounting_contour(Mat img)
 	return contours.size();
 }
 
-Point getCenterPoint(Mat img) {	//무게중심 좌표 비
+Point getCenterPoint(Mat img) {	//무게중심 좌표
 	vector<int> center_res;
 	bin = morph(img);
 	bin = bounding_img(bin);
@@ -196,8 +196,8 @@ Point getCenterPoint(Mat img) {	//무게중심 좌표 비
 	int cnt = connectedComponentsWithStats(bin, labels, stats, centroids);
 	int width = stats.at<int>(1, 2);  // width
 	int height = stats.at<int>(1, 3); // height
-	int center_x = centroids.at<double>(1, 0); // 무게중심 x좌표
-	int center_y = centroids.at<double>(1, 1); // 무게중심 y좌표
+	int center_x = centroids.at<double>(1, 0); // x
+	int center_y = centroids.at<double>(1, 1); // y
 	//비율 계산
 	int per_x = (double)center_x / width * 100;
 	center_res.push_back(per_x);
