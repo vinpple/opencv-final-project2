@@ -95,8 +95,9 @@ void on_mouse(int event, int x, int y, int flags, void*)
 		{
 			// "Save" 버튼이 클릭된 경우
 			cout << " name to save : ";
+			Mat simg = img(Rect(0, 0, 500, 500));
 			getline(cin, fname);
-			imwrite(fname + ".jpg", img);
+			imwrite(fname + ".jpg", simg);
 		}
 		else if (rect_area[2].contains(PtOld))
 		{
