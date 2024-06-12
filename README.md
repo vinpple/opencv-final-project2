@@ -43,6 +43,7 @@ https://youtu.be/eZtCvv4RNvE?si=__MCgM1A17ZDdMrV
 		}
 
  3. 바운딩 박스 구하기
+
 Mat bounding_img(Mat img)
 		{
 			Mat labels, stats, centroids;
