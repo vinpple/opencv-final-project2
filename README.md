@@ -1,3 +1,7 @@
+
+https://youtu.be/eZtCvv4RNvE?si=__MCgM1A17ZDdMrV
+
+
 1. 외곽선 개수 구하기
 
 		int getCounting_contour(Mat img)
