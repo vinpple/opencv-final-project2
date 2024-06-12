@@ -1,415 +1,66 @@
 
-/*
 #include "opencv2/opencv.hpp"
 #include <iostream>
 
 using namespace cv;
 using namespace std;
 
-Mat img(500, 900, CV_8U, Scalar(255, 255, 255));
-Mat img_size(500 / 5, 200, CV_8UC3, Scalar(255, 255, 255));
-string fname;
-Point PtOld;
-void on_mouse(int event, int x, int y, int flags, void*);
-void UI(Mat& img);
-int main()
-{
-	UI(img);
-	namedWindow("img");
-	setMouseCallback("img", on_mouse);
-	waitKey();
-}
-
-void UI(Mat&img)
-{
-	line(img, Point(500, 0), Point(500, 500), Scalar(0, 0, 0), 2);
-	for (int i = 1; i < 5; i++)
-	{
-		line(img, Point(500, 500 * i / 5), Point(700, 500 * i / 5), Scalar(0, 0, 0), 2);
-	}
-	rectangle(img, Rect(0, 0, 700, 500), Scalar(0, 0, 0), 2);
-
-	string text[] = { "Save", "Load", "Clear", "Run", "Exit" };
-	int fontface = FONT_HERSHEY_SCRIPT_COMPLEX;
-	double fontscale = 1;
-	int thick = 2;
-
-	for (int i = 0; i < 5; i++) {
-		Size sizetext = getTextSize(text[i], fontface, fontscale, thick, 0);
-		Size sizeimg = img_size.size();
-		Point org(500 + (sizeimg.width - sizetext.width) / 2,
-			500 * i / 5 + (sizeimg.height + sizetext.height) / 2);
-		putText(img, text[i], org, fontface, fontscale, Scalar(0, 0, 0), thick);
-	}
-}
-
-void on_mouse(int event, int x, int y, int flags, void*)
-{
-	Rect rect_area[] =
-	{
-		Rect(0, 0, 495, 495),
-		Rect(501, 0, 199, 99),
-		Rect(501, 500 / 5 + 1, 199, 99),
-		Rect(501, 500 * 2 / 5 + 1, 199, 99),
-		Rect(501, 500 * 3 / 5 + 1, 199, 99),
-		Rect(501, 500 * 4 / 5 + 1, 199, 99)
-		Rect(700, 0, 199, 99),	//6
-		Rect(700, 500 / 5 + 1, 199, 99),	//7.
-		Rect(700, 500 * 2 / 5 + 1, 199, 99),	//8.
-		Rect(700, 500 * 3 / 5 + 1, 199, 99),	//9.
-
-	};
-	switch (event)
-	{
-	case EVENT_LBUTTONDOWN:
-		PtOld = Point(x, y);
-			if (rect_area[1].contains(PtOld))
-			{
-				cout << " name to save : ";
-				getline(cin, fname);
-				imwrite(fname+".jpg", img);
-			}
-			else if (rect_area[2].contains(PtOld))
-			{
-				while (true) {
-					cout << "load file name(.jpg) : ";
-					getline(cin, fname);
-					img = imread(fname);
-					if (!img.data) {
-						cout << "Could not find the image. Make sure you write .jpg" << endl;
-					}
-					else {
-						imshow("img", img);
-						break;
-					}
-				}
-			}
-			else if (rect_area[3].contains(PtOld))
-			{
-				rectangle(img, Rect(2, 2, 497, 496), Scalar(255, 255, 255), -1);
-				imshow("img", img);
-			}
-			else if (rect_area[4].contains(PtOld))
-			{
-
-			}
-			else if (rect_area[5].contains(PtOld))
-			{
-				cout << "exit" << endl;
-				exit(0);
-			}
-			break;
-		case EVENT_MOUSEMOVE:
-			if (rect_area[0].contains(Point(x, y)))
-			{
-				if (flags & EVENT_FLAG_LBUTTON)
-				{
-					line(img, PtOld, Point(x, y), Scalar(0, 0, 0), 10);
-					imshow("img", img);
-					PtOld = Point(x, y);
-				}
-			}
-			break;
-		}
-	imshow("img", img);
-}
-*/
-
-
-
-
-
-/*
-#include "opencv2/opencv.hpp"
-#include <iostream>
-
-using namespace cv;
-using namespace std;
-
-// ÀÌ¹ÌÁö¿Í ÆÄÀÏ ÀÌ¸§À» ÀúÀåÇÒ º¯¼öµéÀ» Àü¿ª º¯¼ö·Î ¼±¾ğ
-Mat img(500, 900, CV_8U, Scalar(255, 255, 255)); // 500x700 Å©±âÀÇ Èò»ö ÀÌ¹ÌÁö
-Mat img_size(500 / 5, 200, CV_8UC3, Scalar(255, 255, 255)); // ÀÌ¹ÌÁö »çÀÌÁî
-string fname; // ÆÄÀÏ ÀÌ¸§
-Point PtOld; // ¸¶¿ì½º ÀÌº¥Æ® Ã³¸®¿¡ »ç¿ëµÉ ÀÌÀü ÁÂÇ¥
-Mat morph(Mat img);
-Mat bounding_img(Mat img);
-Mat gray, bin;
-
-
-// ¸¶¿ì½º ÀÌº¥Æ®¸¦ Ã³¸®ÇÏ´Â ÇÔ¼ö
-void on_mouse(int event, int x, int y, int flags, void*);
-
-//¿Ü°û¼± °³¼ö ¼¼±â
-int getCounting_contour(Mat img);
-
-// UI ¿ä¼Ò¸¦ ±×¸®´Â ÇÔ¼ö
-void UI(Mat& img);
-
-int main() {
-	// UI ÃÊ±âÈ­
-	UI(img);
-
-	// Ã¢ »ı¼º ¹× ¸¶¿ì½º Äİ¹é ÇÔ¼ö µî·Ï
-	namedWindow("img");
-	setMouseCallback("img", on_mouse);
-
-	// Å° ÀÔ·Â ´ë±â
-	waitKey();
-}
-
-// UI ¿ä¼Ò¸¦ ±×¸®´Â ÇÔ¼ö
-void UI(Mat& img)
-{
-	// ¼öÆò¼± ±×¸®±â
-	line(img, Point(502, 0), Point(502, 500), Scalar(0, 0, 0), 2);
-	line(img, Point(700, 0), Point(700, 500), Scalar(0, 0, 0), 2);
-	// ¼öÁ÷¼± ±×¸®±â
-	for (int i = 1; i < 5; i++)
-	{
-		line(img, Point(500, 500 * i / 5), Point(700, 500 * i / 5), Scalar(0, 0, 0), 2);
-		line(img, Point(700, 500 * i / 5), Point(900, 500 * i / 5), Scalar(0, 0, 0), 2);
-	}
-	// »ç°¢Çü ±×¸®±â
-	rectangle(img, Rect(0, 0, 900, 500), Scalar(0, 0, 0), 2);
-
-	// ¹öÆ° ÅØ½ºÆ®
-	//string text[] = { "Save", "Load", "Clear", "Run", "Exit", "countour", "center"};
-	vector<vector<string>> text = { {"Save", "Load", "Clear", "Run", "Exit"}, {"contour", "center"} };
-	int font =FONT_HERSHEY_DUPLEX;	//ÆùÆ® Á¾·ù
-	double fontscale = 1.0;	//ÆùÆ® Å©±â
-	int thick = 2;	//±Û¾¾ µÎ²²
-	for (int i = 0; i < text.size(); i++) {
-		for (int j = 0; j < text[i].size(); j++) {
-			Size Textsize = getTextSize(text[i][j], font, fontscale, thick, 0);	//±Û¾¾ Å©±â
-			Size imgsize = img_size.size();	//°´Ã¼ »çÀÌÁî
-			Point org(500 + i * 200 + (imgsize.width - Textsize.width) / 2,
-				500 * j / 5 + (imgsize.height + Textsize.height) / 2);
-			putText(img, text[i][j], org, font, fontscale, Scalar(0, 0, 0), thick);
-		}
-	}
-}
-
-
-// ¸¶¿ì½º ÀÌº¥Æ®¸¦ Ã³¸®ÇÏ´Â ÇÔ¼ö
-void on_mouse(int event, int x, int y, int flags, void*)
-{
-	// ¹öÆ° ¿µ¿ªÀ» Á¤ÀÇÇÏ´Â »ç°¢Çü ¹è¿­
-	Rect rect_area[] =
-	{
-		Rect(0, 0, 495, 495),
-		Rect(501, 0, 199, 99),
-		Rect(501, 500 / 5 + 1, 199, 99),
-		Rect(501, 500 * 2 / 5 + 1, 199, 99),
-		Rect(501, 500 * 3 / 5 + 1, 199, 99),
-		Rect(501, 500 * 4 / 5 + 1, 199, 99),
-		Rect(700, 0, 199, 99),   //contour
-		Rect(700, 500 / 5 + 1, 199, 99),   //¹«°Ô Áß½É
-		Rect(700, 500 * 2 / 5 + 1, 199, 99),
-		Rect(700, 500 * 3 / 5 + 1, 199, 99),
-		Rect(700, 500 * 4 / 5 + 1, 199, 99)
-
-	};
-
-	switch (event) {
-	case EVENT_LBUTTONDOWN:
-		// ¿ŞÂÊ ¸¶¿ì½º ¹öÆ°ÀÌ ´­¸° °æ¿ì
-		PtOld = Point(x, y);
-		if (rect_area[1].contains(PtOld))
-		{
-			// "Save" ¹öÆ°ÀÌ Å¬¸¯µÈ °æ¿ì
-			cout << " name to save : ";
-			getline(cin, fname);
-			imwrite(fname + ".jpg", img);
-		}
-		else if (rect_area[2].contains(PtOld))
-		{
-			// "Load" ¹öÆ°ÀÌ Å¬¸¯µÈ °æ¿ì
-			while (true) {
-				cout << "load file name(.jpg) : ";
-				getline(cin, fname);
-				img = imread(fname);
-				if (!img.data) {
-					// ÀÌ¹ÌÁö¸¦ Ã£À» ¼ö ¾ø°Å³ª ÀÌ¸§À» Àß¸ø ÀÔ·ÂÇÑ °æ¿ì
-					cout << "Could not find the image. Make sure you write .jpg" << endl;
-				}
-				else {
-					// ¿Ã¹Ù¸¥ ÀÌ¹ÌÁö¸¦ ·ÎµåÇÑ °æ¿ì
-					imshow("img", img);
-					break;
-				}
-			}
-		}
-		else if (rect_area[3].contains(PtOld))
-		{
-			// "Clear" ¹öÆ°ÀÌ Å¬¸¯µÈ °æ¿ì
-			rectangle(img, Rect(2, 2, 497, 496), Scalar(255, 255, 255), -1);
-			imshow("img", img);
-		}
-		else if (rect_area[4].contains(PtOld))
-		{
-			// "Run" ¹öÆ°ÀÌ Å¬¸¯µÈ °æ¿ì (±¸ÇöµÇÁö ¾ÊÀ½)
-		}
-		else if (rect_area[5].contains(PtOld))
-		{
-			// "Exit" ¹öÆ°ÀÌ Å¬¸¯µÈ °æ¿ì
-			cout << "exit" << endl;
-			exit(0);
-		}
-		else if (rect_area[6].contains(PtOld))
-		{
-			cout << "contour" << endl;
-
-			int count_contour = getCounting_contour(img);
-
-			cout << "¿Ü°û¼± °³¼ö : " << count_contour << endl;
-			if (count_contour == 1)
-			{
-				cout << "¿Ü°û¼± °³¼ö: 1 (1, 2, 3, 5, 7)" << endl;
-			}
-			else if (count_contour == 2) {
-				cout << "¿Ü°û¼± °³¼ö: 2 (0, 4, 6, 9)" << endl;
-			}
-			else if (count_contour == 3) {
-				cout << "¿Ü°û¼± °³¼ö 3 (8)" << endl;
-			}
-		}
-		break;
-
-
-	case EVENT_MOUSEMOVE:
-		if (rect_area[0].contains(Point(x, y)))
-		{
-			if (flags & EVENT_FLAG_LBUTTON)
-			{
-				line(img, PtOld, Point(x, y), Scalar(0, 0, 0), 10);
-				imshow("img", img);
-				PtOld = Point(x, y);
-			}
-		}
-		break;
-	}
-	imshow("img", img);
-}
-
-
-int getCounting_contour(Mat img)
-{
-	bin = morph(img);
-	bin = bounding_img(bin);
-
-	vector<vector<Point>> contours;
-	findContours(bin, contours, RETR_LIST, CHAIN_APPROX_NONE);
-	imshow("boundingbox", bin);
-
-	return contours.size();
-}
-
-
-Mat morph(Mat img)
-{
-	cvtColor(img(Rect(0,0,500,500)), gray, COLOR_BGR2GRAY);
-	threshold(gray, bin, 0, 255, THRESH_BINARY_INV | THRESH_OTSU);
-
-	Mat labels, stats, centroids;
-	int cnt = connectedComponentsWithStats(bin, labels, stats, centroids);
-	int* p = stats.ptr<int>(1);
-
-	int rows = (p[0] + p[2]) / 8;	//10Àº ÀÓÀÇÀÇ °ª
-	int cols = (p[1] + p[3]) / 8;
-
-	int morph_size = 2;
-	if (cnt > 2) {
-		while (true) {
-			morphologyEx(bin, bin, MORPH_CLOSE, Mat(morph_size, morph_size, CV_8UC1));
-			cnt = connectedComponentsWithStats(bin, labels, stats, centroids);
-			if (cnt <= 2) break;
-			morph_size += 3;
-		}
-	}
-	return bin;
-}
-
-Mat bounding_img(Mat img)
-{
-	bin = morph(img);
-	Mat labels, stats, centroids;
-
-	int cnt = connectedComponentsWithStats(bin, labels, stats, centroids);
-	if (cnt < 2)
-	{
-		cerr << "Bounding box not found. Possibly too small." << endl;
-		return Mat();
-	}
-	int* p = stats.ptr<int>(1);
-	bin= bin(Rect(p[0], p[1], p[2], p[3]));
-	imshow("bin", bin);
-
-	return bin;
-}
-*/
-
-#include "opencv2/opencv.hpp"
-#include <iostream>
-
-using namespace cv;
-using namespace std;
-
-// ÀÌ¹ÌÁö¿Í ÆÄÀÏ ÀÌ¸§À» ÀúÀåÇÒ º¯¼öµéÀ» Àü¿ª º¯¼ö·Î ¼±¾ğ
-Mat img(500, 900, CV_8UC3, Scalar(255, 255, 255)); // 500x700 Å©±âÀÇ Èò»ö ÀÌ¹ÌÁö
-Mat img_size(500 / 5, 200, CV_8UC3, Scalar(255, 255, 255)); // ÀÌ¹ÌÁö »çÀÌÁî
-string fname; // ÆÄÀÏ ÀÌ¸§
-Point PtOld; // ¸¶¿ì½º ÀÌº¥Æ® Ã³¸®¿¡ »ç¿ëµÉ ÀÌÀü ÁÂÇ¥
+// ì´ë¯¸ì§€ì™€ íŒŒì¼ ì´ë¦„ì„ ì €ì¥í•  ë³€ìˆ˜ë“¤ì„ ì „ì—­ ë³€ìˆ˜ë¡œ ì„ ì–¸
+Mat img(500, 900, CV_8UC3, Scalar(255, 255, 255)); // 500x700 í¬ê¸°ì˜ í°ìƒ‰ ì´ë¯¸ì§€
+Mat img_size(500 / 5, 200, CV_8UC3, Scalar(255, 255, 255)); // ì´ë¯¸ì§€ ì‚¬ì´ì¦ˆ
+string fname; // íŒŒì¼ ì´ë¦„
+Point PtOld; // ë§ˆìš°ìŠ¤ ì´ë²¤íŠ¸ ì²˜ë¦¬ì— ì‚¬ìš©ë  ì´ì „ ì¢Œí‘œ
 Mat morph(Mat img);
 Mat bounding_img(Mat img);
 Mat gray, bin;
 Mat draw_img;
 Point getCenterPoint(Mat img);
 
-// ¸¶¿ì½º ÀÌº¥Æ®¸¦ Ã³¸®ÇÏ´Â ÇÔ¼ö
+// ë§ˆìš°ìŠ¤ ì´ë²¤íŠ¸ë¥¼ ì²˜ë¦¬í•˜ëŠ” í•¨ìˆ˜
 void on_mouse(int event, int x, int y, int flags, void*);
 
-//¿Ü°û¼± °³¼ö ¼¼±â
+//ì™¸ê³½ì„  ê°œìˆ˜ ì„¸ê¸°
 int getCounting_contour(Mat img);
 
-// UI ¿ä¼Ò¸¦ ±×¸®´Â ÇÔ¼ö
+// UI ìš”ì†Œë¥¼ ê·¸ë¦¬ëŠ” í•¨ìˆ˜
 void UI(Mat& img);
 
 int main() {
-	// UI ÃÊ±âÈ­
+	// UI ì´ˆê¸°í™”
 	UI(img);
 
-	// Ã¢ »ı¼º ¹× ¸¶¿ì½º Äİ¹é ÇÔ¼ö µî·Ï
+	// ì°½ ìƒì„± ë° ë§ˆìš°ìŠ¤ ì½œë°± í•¨ìˆ˜ ë“±ë¡
 	namedWindow("img");
 	setMouseCallback("img", on_mouse);
 
-	// Å° ÀÔ·Â ´ë±â
+	// í‚¤ ì…ë ¥ ëŒ€ê¸°
 	waitKey();
 }
 
-// UI ¿ä¼Ò¸¦ ±×¸®´Â ÇÔ¼ö
+// UI ìš”ì†Œë¥¼ ê·¸ë¦¬ëŠ” í•¨ìˆ˜
 void UI(Mat& img)
 {
-	// ¼öÆò¼± ±×¸®±â
+	// ìˆ˜í‰ì„  ê·¸ë¦¬ê¸°
 	line(img, Point(502, 0), Point(502, 500), Scalar(0, 0, 0), 2);
 	line(img, Point(700, 0), Point(700, 500), Scalar(0, 0, 0), 2);
-	// ¼öÁ÷¼± ±×¸®±â
+	// ìˆ˜ì§ì„  ê·¸ë¦¬ê¸°
 	for (int i = 1; i < 5; i++)
 	{
 		line(img, Point(500, 500 * i / 5), Point(700, 500 * i / 5), Scalar(0, 0, 0), 2);
 		line(img, Point(700, 500 * i / 5), Point(900, 500 * i / 5), Scalar(0, 0, 0), 2);
 	}
-	// »ç°¢Çü ±×¸®±â
+	// ì‚¬ê°í˜• ê·¸ë¦¬ê¸°
 	rectangle(img, Rect(0, 0, 900, 500), Scalar(0, 0, 0), 2);
 
-	// ¹öÆ° ÅØ½ºÆ®
+	// ë²„íŠ¼ í…ìŠ¤íŠ¸
 	vector<vector<string>> text = { {"Save", "Load", "Clear", "Run", "Exit"}, {"contour", "center"} };
-	int font = FONT_HERSHEY_DUPLEX;   // ÆùÆ® Á¾·ù
-	double fontscale = 1.0;   // ÆùÆ® Å©±â
-	int thick = 2;   // ±Û¾¾ µÎ²²
+	int font = FONT_HERSHEY_DUPLEX;   // í°íŠ¸ ì¢…ë¥˜
+	double fontscale = 1.0;   // í°íŠ¸ í¬ê¸°
+	int thick = 2;   // ê¸€ì”¨ ë‘ê»˜
 	for (int i = 0; i < text.size(); i++) {
 		for (int j = 0; j < text[i].size(); j++) {
-			Size Textsize = getTextSize(text[i][j], font, fontscale, thick, 0);   // ±Û¾¾ Å©±â
-			Size imgsize = img_size.size();   // °´Ã¼ »çÀÌÁî
+			Size Textsize = getTextSize(text[i][j], font, fontscale, thick, 0);   // ê¸€ì”¨ í¬ê¸°
+			Size imgsize = img_size.size();   // ê°ì²´ ì‚¬ì´ì¦ˆ
 			Point org(500 + i * 200 + (imgsize.width - Textsize.width) / 2,
 				500 * j / 5 + (imgsize.height + Textsize.height) / 2);
 			putText(img, text[i][j], org, font, fontscale, Scalar(0, 0, 0), thick);
@@ -417,10 +68,10 @@ void UI(Mat& img)
 	}
 }
 
-// ¸¶¿ì½º ÀÌº¥Æ®¸¦ Ã³¸®ÇÏ´Â ÇÔ¼ö
+// ë§ˆìš°ìŠ¤ ì´ë²¤íŠ¸ë¥¼ ì²˜ë¦¬í•˜ëŠ” í•¨ìˆ˜
 void on_mouse(int event, int x, int y, int flags, void*)
 {
-	// ¹öÆ° ¿µ¿ªÀ» Á¤ÀÇÇÏ´Â »ç°¢Çü ¹è¿­
+	// ë²„íŠ¼ ì˜ì—­ì„ ì •ì˜í•˜ëŠ” ì‚¬ê°í˜• ë°°ì—´
 	Rect rect_area[] =
 	{
 		Rect(0, 0, 495, 495),
@@ -430,7 +81,7 @@ void on_mouse(int event, int x, int y, int flags, void*)
 		Rect(501, 500 * 3 / 5 + 1, 199, 99),
 		Rect(501, 500 * 4 / 5 + 1, 199, 99),
 		Rect(700, 0, 199, 99),   // contour
-		Rect(700, 500 / 5 + 1, 199, 99),   // ¹«°Ô Áß½É
+		Rect(700, 500 / 5 + 1, 199, 99),   // ë¬´ê²Œ ì¤‘ì‹¬
 		Rect(700, 500 * 2 / 5 + 1, 199, 99),
 		Rect(700, 500 * 3 / 5 + 1, 199, 99),
 		Rect(700, 500 * 4 / 5 + 1, 199, 99)
@@ -438,28 +89,28 @@ void on_mouse(int event, int x, int y, int flags, void*)
 
 	switch (event) {
 	case EVENT_LBUTTONDOWN:
-		// ¿ŞÂÊ ¸¶¿ì½º ¹öÆ°ÀÌ ´­¸° °æ¿ì
+		// ì™¼ìª½ ë§ˆìš°ìŠ¤ ë²„íŠ¼ì´ ëˆŒë¦° ê²½ìš°
 		PtOld = Point(x, y);
 		if (rect_area[1].contains(PtOld))
 		{
-			// "Save" ¹öÆ°ÀÌ Å¬¸¯µÈ °æ¿ì
+			// "Save" ë²„íŠ¼ì´ í´ë¦­ëœ ê²½ìš°
 			cout << " name to save : ";
 			getline(cin, fname);
 			imwrite(fname + ".jpg", img);
 		}
 		else if (rect_area[2].contains(PtOld))
 		{
-			// "Load" ¹öÆ°ÀÌ Å¬¸¯µÈ °æ¿ì
+			// "Load" ë²„íŠ¼ì´ í´ë¦­ëœ ê²½ìš°
 			while (true) {
 				cout << "load file name(.jpg) : ";
 				getline(cin, fname);
 				img = imread(fname);
 				if (!img.data) {
-					// ÀÌ¹ÌÁö¸¦ Ã£À» ¼ö ¾ø°Å³ª ÀÌ¸§À» Àß¸ø ÀÔ·ÂÇÑ °æ¿ì
+					// ì´ë¯¸ì§€ë¥¼ ì°¾ì„ ìˆ˜ ì—†ê±°ë‚˜ ì´ë¦„ì„ ì˜ëª» ì…ë ¥í•œ ê²½ìš°
 					cout << "Could not find the image. Make sure you write .jpg" << endl;
 				}
 				else {
-					// ¿Ã¹Ù¸¥ ÀÌ¹ÌÁö¸¦ ·ÎµåÇÑ °æ¿ì
+					// ì˜¬ë°”ë¥¸ ì´ë¯¸ì§€ë¥¼ ë¡œë“œí•œ ê²½ìš°
 					imshow("img", img);
 					break;
 				}
@@ -467,17 +118,17 @@ void on_mouse(int event, int x, int y, int flags, void*)
 		}
 		else if (rect_area[3].contains(PtOld))
 		{
-			// "Clear" ¹öÆ°ÀÌ Å¬¸¯µÈ °æ¿ì
+			// "Clear" ë²„íŠ¼ì´ í´ë¦­ëœ ê²½ìš°
 			rectangle(img, Rect(2, 2, 497, 496), Scalar(255, 255, 255), -1);
 			imshow("img", img);
 		}
 		else if (rect_area[4].contains(PtOld))
 		{
-			// "Run" ¹öÆ°ÀÌ Å¬¸¯µÈ °æ¿ì (±¸ÇöµÇÁö ¾ÊÀ½)
+			// "Run" ë²„íŠ¼ì´ í´ë¦­ëœ ê²½ìš° (êµ¬í˜„ë˜ì§€ ì•ŠìŒ)
 		}
 		else if (rect_area[5].contains(PtOld))
 		{
-			// "Exit" ¹öÆ°ÀÌ Å¬¸¯µÈ °æ¿ì
+			// "Exit" ë²„íŠ¼ì´ í´ë¦­ëœ ê²½ìš°
 			cout << "exit" << endl;
 			exit(0);
 		}
@@ -487,18 +138,18 @@ void on_mouse(int event, int x, int y, int flags, void*)
 
 			int count_contour = getCounting_contour(img);
 
-			cout << "¿Ü°û¼± °³¼ö : " << count_contour << endl;
+			cout << "ì™¸ê³½ì„  ê°œìˆ˜ : " << count_contour << endl;
 			if (count_contour == 1)
 			{
-				cout << "¿Ü°û¼± °³¼ö: 1 (1, 2, 3, 5, 7)" << endl;
+				cout << "ì™¸ê³½ì„  ê°œìˆ˜: 1 (1, 2, 3, 5, 7)" << endl;
 			}
 			else if (count_contour == 2) {
-				cout << "¿Ü°û¼± °³¼ö: 2 (0, 4, 6, 9)" << endl;
+				cout << "ì™¸ê³½ì„  ê°œìˆ˜: 2 (0, 4, 6, 9)" << endl;
 			}
 			else if (count_contour == 3) {
-				cout << "¿Ü°û¼± °³¼ö 3 (8)" << endl;
+				cout << "ì™¸ê³½ì„  ê°œìˆ˜ 3 (8)" << endl;
 			}
-			else if (rect_area[7].contains(Point(x, y))) {	//¹«°ÔÁß½É ºñ
+			else if (rect_area[7].contains(Point(x, y))) {	//ë¬´ê²Œì¤‘ì‹¬ ë¹„
 				cout << "center press" << endl;
 
 				Point center_pt = getCenterPoint(img);
@@ -536,7 +187,7 @@ int getCounting_contour(Mat img)
 	return contours.size();
 }
 
-Point getCenterPoint(Mat img) {	//¹«°ÔÁß½É ÁÂÇ¥ ºñ
+Point getCenterPoint(Mat img) {	//ë¬´ê²Œì¤‘ì‹¬ ì¢Œí‘œ ë¹„
 	vector<int> center_res;
 	bin = morph(img);
 	bin = bounding_img(bin);
@@ -545,9 +196,9 @@ Point getCenterPoint(Mat img) {	//¹«°ÔÁß½É ÁÂÇ¥ ºñ
 	int cnt = connectedComponentsWithStats(bin, labels, stats, centroids);
 	int width = stats.at<int>(1, 2);  // width
 	int height = stats.at<int>(1, 3); // height
-	int center_x = centroids.at<double>(1, 0); // ¹«°ÔÁß½É xÁÂÇ¥
-	int center_y = centroids.at<double>(1, 1); // ¹«°ÔÁß½É yÁÂÇ¥
-	//ºñÀ² °è»ê
+	int center_x = centroids.at<double>(1, 0); // ë¬´ê²Œì¤‘ì‹¬ xì¢Œí‘œ
+	int center_y = centroids.at<double>(1, 1); // ë¬´ê²Œì¤‘ì‹¬ yì¢Œí‘œ
+	//ë¹„ìœ¨ ê³„ì‚°
 	int per_x = (double)center_x / width * 100;
 	center_res.push_back(per_x);
 	int per_y = (double)center_y / height * 100;
@@ -576,7 +227,7 @@ Mat bounding_img(Mat img)
 }
 
 
-Mat morph(Mat img) {	//¸ğÆú·ÎÁö ¿¬»ê
+Mat morph(Mat img) {	//ëª¨í´ë¡œì§€ ì—°ì‚°
 	draw_img = img(Rect(0, 0, 500, 500));
 	cvtColor(draw_img, gray, COLOR_BGR2GRAY);
 	threshold(gray, bin, 0, 255, THRESH_BINARY_INV | THRESH_OTSU);
